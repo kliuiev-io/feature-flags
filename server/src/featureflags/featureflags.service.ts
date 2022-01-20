@@ -1,24 +1,19 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-
-const mockFlags: { [key: string]: boolean } = {};
+import { DatabaseService } from 'src/database/database.service';
 
 @Injectable()
 export class FeatureFlagsService {
-  checkFlag(flagName: string): boolean {
-    if (typeof mockFlags[flagName] === 'undefined')
-      throw new NotFoundException();
+  constructor(private readonly databaseService: DatabaseService) {}
 
-    return mockFlags[flagName];
+  async checkFlag(flagName: string) {
+    return this.databaseService.flagGet(flagName); 
   }
 
-  setFlag(flagName: string, value: boolean) {
-    mockFlags[flagName] = value;
+  async setFlag(flagName: string, value: boolean) {
+    await this.databaseService.flagSet(flagName, value);
   }
 
-  deleteFlag(flagName: string) {
-    if (typeof mockFlags[flagName] === 'undefined')
-      throw new NotFoundException();
-
-    delete mockFlags[flagName];
+  async deleteFlag(flagName: string) {
+    await this.databaseService.flagDelete(flagName);
   }
 }
