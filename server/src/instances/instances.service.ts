@@ -5,15 +5,19 @@ import { DatabaseService } from 'src/database/database.service';
 export class InstancesService {
   constructor(private readonly databaseService: DatabaseService) {}
 
+  async getInstances() {
+    return this.databaseService.instanceGetInstances();
+  }
+
   async addInstance(name: string) {
-    await this.databaseService.instanceCreate(name);
+    return this.databaseService.instanceCreate(name);
   }
 
   async renameInstance(oldName: string, newName: string) {
-    await this.databaseService.instanceRename(oldName, newName);
+    return this.databaseService.instanceRename(oldName, newName);
   }
 
   async deleteInstance(name: string) {
-    await this.databaseService.instanceDelete(name);
+    return this.databaseService.instanceDelete(name);
   }
 }

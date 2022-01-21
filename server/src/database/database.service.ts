@@ -42,6 +42,10 @@ export class DatabaseService {
     mockDatabase[name] = {};
   }
 
+  async instanceGetInstances() {
+    return Object.keys(mockDatabase);
+  }
+
   async instanceGetFlags(name: string) {
     await this.throwIfInstanceDoesNotExist(name);
 

@@ -5,15 +5,19 @@ import { DatabaseService } from 'src/database/database.service';
 export class FeatureFlagsService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  async checkFlag(flagName: string) {
-    return this.databaseService.flagGet(flagName); 
+  async getFlags(instance: string) {
+    return this.databaseService.instanceGetFlags(instance);
   }
 
-  async setFlag(flagName: string, value: boolean) {
-    await this.databaseService.flagSet(flagName, value);
+  async checkFlag(flagName: string, instance: string) {
+    return this.databaseService.flagGet(flagName, instance);
   }
 
-  async deleteFlag(flagName: string) {
-    await this.databaseService.flagDelete(flagName);
+  async setFlag(flagName: string, value: boolean, instance: string) {
+    await this.databaseService.flagSet(flagName, value, instance);
+  }
+
+  async deleteFlag(flagName: string, instance: string) {
+    await this.databaseService.flagDelete(flagName, instance);
   }
 }
