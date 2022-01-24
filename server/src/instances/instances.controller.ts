@@ -14,12 +14,14 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiTags,
 } from '@nestjs/swagger';
 import CreateInstanceDto from './dto/create-instance.dto';
 import RenameInstanceDto from './dto/rename-instance.dto';
 import { InstancesService } from './instances.service';
 
 @Controller('instances')
+@ApiTags('instances')
 export class InstancesController {
   constructor(private readonly instancesService: InstancesService) {}
 
