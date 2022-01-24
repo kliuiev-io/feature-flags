@@ -1,35 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { generateId } from 'src/utils';
-
-interface Flag {
-  id: string;
-  name: string;
-  description: string;
-  defaultState: boolean;
-}
-
-type Flags = { [key: string]: Flag };
-
-interface Group {
-  id: string;
-  name: string;
-  description: string;
-  flags: string[];
-}
-
-interface User {
-  email: string;
-  groups: string[];
-  flags: string[];
-}
-
-interface Instance {
-  flags: Flags;
-  groups: Group[];
-  users: User[];
-}
-
-type Instances = { [key: string]: Instance };
+import { Flag, Flags, Group, GroupBase, Instances } from './database.interface';
 
 const mockDatabase: Instances = {};
 
@@ -206,7 +177,7 @@ export class DatabaseService {
     return mockDatabase[instance].groups;
   }
 
-  async groupAdd({ name, description }: Group, instance: string) {
+  async groupAdd({ name, description }: GroupBase, instance: string) {
     await this.throwIfInstanceDoesNotExist(instance);
 
     mockDatabase[instance].groups.push({
@@ -219,7 +190,7 @@ export class DatabaseService {
 
   async groupUpdate(
     groupId: string,
-    { name, description }: Group,
+    { name, description }: GroupBase,
     instance: string,
   ) {
     const group = await this.groupGetById(groupId, instance);
