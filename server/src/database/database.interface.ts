@@ -1,8 +1,11 @@
-export interface Flag {
-  id: string;
+export interface FlagBase {
   description: string;
   defaultState: boolean;
 }
+
+export type Flag = FlagBase & {
+  id: string;
+};
 
 export type Flags = { [key: string]: Flag };
 

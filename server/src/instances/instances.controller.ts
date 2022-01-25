@@ -16,8 +16,10 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+import CreateFlagDto from './dto/create-flag.dto';
 import CreateInstanceDto from './dto/create-instance.dto';
 import RenameInstanceDto from './dto/rename-instance.dto';
+import UpdateFlagDto from './dto/update-flag.dto';
 import { InstancesService } from './instances.service';
 
 @Controller('instances')
@@ -65,6 +67,64 @@ export class InstancesController {
   @ApiBadRequestResponse()
   @HttpCode(HttpStatus.CREATED)
   async deleteInstance(@Param('instance') instance: string) {
-    this.instancesService.deleteInstance(instance);
+    return this.instancesService.deleteInstance(instance);
+  }
+
+  @Get('/:instance/flags')
+  @ApiOperation({
+    description: 'Get instance flags',
+  })
+  @ApiOkResponse()
+  @ApiNotFoundResponse()
+  @ApiBadRequestResponse()
+  @HttpCode(HttpStatus.CREATED)
+  async getFlags(@Param('instance') instance: string) {
+    return this.instancesService.getFlags(instance);
+  }
+
+  @Post('/:instance/flags')
+  @ApiOperation({
+    description: 'Create instance flag',
+  })
+  @ApiOkResponse()
+  @ApiNotFoundResponse()
+  @ApiBadRequestResponse()
+  @HttpCode(HttpStatus.CREATED)
+  async createFlag(
+    @Param('instance') instance: string,
+    @Body() flagData: CreateFlagDto,
+  ) {
+    return this.instancesService.addFlag(flagData.name, instance, flagData);
+  }
+
+  @Put('/:instance/flags/:flagName')
+  @ApiOperation({
+    description: 'Update instance flag',
+  })
+  @ApiOkResponse()
+  @ApiNotFoundResponse()
+  @ApiBadRequestResponse()
+  @HttpCode(HttpStatus.CREATED)
+  async updateFlag(
+    @Param('instance') instance: string,
+    @Param('flagName') flagName: string,
+    @Body() flagData: UpdateFlagDto,
+  ) {
+    return this.instancesService.updateFlag(flagName, instance, flagData);
+  }
+
+  @Delete('/:instance/flags/:flagName')
+  @ApiOperation({
+    description: 'Delete instance flag',
+  })
+  @ApiOkResponse()
+  @ApiNotFoundResponse()
+  @ApiBadRequestResponse()
+  @HttpCode(HttpStatus.CREATED)
+  async deleteFlag(
+    @Param('instance') instance: string,
+    @Param('flagName') flagName: string,
+  ) {
+    return this.instancesService.deleteFlag(flagName, instance);
   }
 }
