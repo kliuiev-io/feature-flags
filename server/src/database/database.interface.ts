@@ -1,6 +1,5 @@
 export interface Flag {
   id: string;
-  name: string;
   description: string;
   defaultState: boolean;
 }

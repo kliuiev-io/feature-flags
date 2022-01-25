@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { generateId } from 'src/utils';
-import { Flag, Flags, Group, GroupBase, Instances } from './database.interface';
+import { Flag, Flags, GroupBase, Instances } from './database.interface';
 
 const mockDatabase: Instances = {};
 
@@ -40,7 +40,7 @@ export class DatabaseService {
   async instanceFlagCreate(
     flagName: string,
     instance: string,
-    { name, description, defaultState }: Flag,
+    { description, defaultState }: Flag,
   ) {
     if (await this.instanceFlagCheckExists(flagName, instance))
       throw new NotFoundException(
@@ -49,7 +49,6 @@ export class DatabaseService {
 
     mockDatabase[instance].flags[flagName] = {
       id: generateId(),
-      name,
       description,
       defaultState,
     };
@@ -58,7 +57,7 @@ export class DatabaseService {
   async instanceFlagUpdate(
     flagName: string,
     instance: string,
-    { name, description, defaultState }: Flag,
+    { description, defaultState }: Flag,
   ) {
     await this.throwIfInstanceFlagDoesNotExist(flagName, instance);
 
@@ -66,7 +65,6 @@ export class DatabaseService {
 
     mockDatabase[instance].flags[flagName] = {
       ...flag,
-      name: name || flag.name,
       description: description || flag.description,
       defaultState:
         typeof defaultState === 'boolean' ? defaultState : flag.defaultState,
