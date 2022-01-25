@@ -1,9 +1,27 @@
 <template>
-  <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
+  <div id="app">
+    <el-container>
+      <el-header>
+        <el-menu
+          :default-active="activeIndex"
+          class="el-menu-demo"
+          mode="horizontal"
+          @select="handleSelect"
+        >
+          <li class="el-menu-item"><el-link href="/"><b>Feature flags</b></el-link></li>
+          <el-menu-item index="2"><el-link href="/instances">Instances</el-link></el-menu-item>
+          <el-menu-item index="3"><el-link href="/groups">Groups</el-link></el-menu-item>
+          <el-menu-item index="4"><el-link href="/users">Users</el-link></el-menu-item>
+          <el-menu-item index="5" disabled>Admins</el-menu-item>
+        </el-menu>
+      </el-header>
+
+      <el-aside></el-aside>
+      <el-main>
+        <router-view />
+      </el-main>
+    </el-container>
   </div>
-  <router-view/>
 </template>
 
 <style lang="scss">

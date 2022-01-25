@@ -1,7 +1,6 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <div>Feature flags</div>
+    <div>Groups</div>
   </div>
 </template>
 
@@ -12,5 +11,5 @@ import { Options, Vue } from 'vue-class-component';
   components: {
   },
 })
-export default class Home extends Vue {}
+export default class Groups extends Vue {}
 </script>
