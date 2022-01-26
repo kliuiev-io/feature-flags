@@ -21,7 +21,7 @@ const config = {
 }
 
 export class Api {
-  static get = <T>(url: string, options?: AxiosRequestConfig) => request.get<any, T>(`${config.apiUrl}/${url}`, options);
+  static get = <T = unknown>(url: string, options?: AxiosRequestConfig) => request.get<any, T>(`${config.apiUrl}/${url}`, options);
 
   static post = <T>(url: string, data?: object, options?: AxiosRequestConfig) => request.post<any, T>(`${config.apiUrl}/${url}`, data, options);
 
