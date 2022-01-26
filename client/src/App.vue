@@ -3,15 +3,16 @@
     <el-container>
       <el-header>
         <el-menu
-          :default-active="activeIndex"
+          :default-active="currentPath"
           class="el-menu-demo"
           mode="horizontal"
-          @select="handleSelect"
         >
           <li class="el-menu-item"><el-link href="/"><b>Feature flags</b></el-link></li>
-          <el-menu-item index="2"><el-link href="/instances">Instances</el-link></el-menu-item>
-          <el-menu-item index="3"><el-link href="/groups">Groups</el-link></el-menu-item>
-          <el-menu-item index="4"><el-link href="/users">Users</el-link></el-menu-item>
+          <el-menu-item v-for="link in links" :index="link[0]" :key="link[0]">
+            <el-link :href="link[0]">{{link[1]}}</el-link>
+          </el-menu-item>
+          <!-- <el-menu-item index="3"><el-link href="/groups">Groups</el-link></el-menu-item>
+          <el-menu-item index="4"><el-link href="/users">Users</el-link></el-menu-item> -->
           <el-menu-item index="5" disabled>Admins</el-menu-item>
         </el-menu>
       </el-header>
@@ -24,12 +25,35 @@
   </div>
 </template>
 
+<script lang="ts">
+import { computed, defineComponent } from 'vue';
+import { useRouter } from 'vue-router';
+
+export default defineComponent({
+  setup() {
+    const router = useRouter();
+
+    const currentPath = computed(() => router.currentRoute.value.path);
+
+    const links = [
+      ['/instances', 'Instances'],
+      ['/groups', 'Groups'],
+      ['/users', 'Users'],
+    ];
+
+    return {
+      currentPath,
+      links,
+    };
+  },
+});
+</script>
+
 <style lang="scss">
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
 }
 
