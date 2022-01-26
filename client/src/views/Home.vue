@@ -1,7 +1,10 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <div>Feature flags</div>
+    <center>
+      <h1>Feature flags</h1>
+      <img alt="Vue logo" src="../assets/logo.png">
+      <div>Select or create an instance to continue</div>
+    </center>
   </div>
 </template>
 

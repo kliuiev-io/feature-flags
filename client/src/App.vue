@@ -10,7 +10,8 @@
           <el-menu-item v-for="link in links" :index="link[0]" :key="link[0]">
             <el-link :href="link[0]">{{link[1]}}</el-link>
           </el-menu-item>
-          <el-menu-item index="5" disabled>Admins</el-menu-item>
+
+          <div style="margin-left: 48vw" class="instance-select">Current instance:&nbsp;&nbsp;</div>
 
           <el-select :model-value="currentInstance" @change="changeInstance" class="instance-select" placeholder="Select">
             <el-option

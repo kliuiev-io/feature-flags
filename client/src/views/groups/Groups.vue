@@ -1,5 +1,5 @@
 <template>
-  <div class="home">
+  <div class="home" v-if="instance">
     <h1>Groups <el-button round @click="createGroup">+</el-button></h1>
 
     <el-table :data="groups" style="width: 100%">
@@ -14,6 +14,7 @@
       </el-table-column>
     </el-table>
   </div>
+  <el-empty description="Please select an Instance" />
 </template>
 
 <script lang="ts">
