@@ -15,59 +15,47 @@
 </template>
 
 <script lang="ts">
-import { onMounted, reactive, ref } from 'vue';
-import { InstancesApi } from '../../api/instances';
+import { InstancesApi } from '@/api/instances';
+import { Options, Vue } from 'vue-class-component';
 
-export default {
-  setup() {
-    const instances = ref<{name: string}[]>([]);
+@Options({})
+export default class Instances extends Vue {
+  instances: {name: string}[] = [];
 
-    async function fetchInstances() {
-      // instances = instances.slice();
-      instances.value = (await InstancesApi.getInstances()).map((instance) => ({ name: instance }));
-    }
+  mounted() {
+    this.fetchInstances();
+  }
 
-    async function deleteInstance(name: string) {
-      if (!confirm(`Do you really want to delete instance ${name} and ALL ITS DATA (groups, users, flags)?`)) return;
-      await InstancesApi.deleteInstance(name);
-      instances.value = instances.value.filter((instance) => instance.name !== name);
-    }
+  async fetchInstances() {
+    const instances = await InstancesApi.getInstances();
 
-    async function createInstance() {
-      const name = prompt('Enter instance name:', 'instance-name');
+    this.instances = instances.map((instance) => ({ name: instance }));
+  }
 
-      if (!name) return;
+  async deleteInstance(name: string) {
+    if (!confirm(`Do you really want to delete instance ${name} and ALL ITS DATA (groups, users, flags)?`)) return;
+    await InstancesApi.deleteInstance(name);
+    this.instances = this.instances.filter((instance) => instance.name !== name);
+  }
 
-      await InstancesApi.createInstance(name);
+  async createInstance() {
+    const name = prompt('Enter instance name:', 'instance-name');
 
-      instances.value.push({ name });
-    }
+    if (!name) return;
 
-    async function renameInstance(oldName: string) {
-      const newName = prompt('Enter new instance name:', oldName);
+    await InstancesApi.createInstance(name);
 
-      if (!newName) return;
+    this.instances.push({ name });
+  }
 
-      await InstancesApi.renameInstance(oldName, newName);
+  async renameInstance(oldName: string) {
+    const newName = prompt('Enter new instance name:', oldName);
 
-      instances.value = instances.value.map((instance) => (instance.name === oldName ? { name: newName } : instance));
-    }
+    if (!newName) return;
 
-    onMounted(fetchInstances);
+    await InstancesApi.renameInstance(oldName, newName);
 
-    return {
-      instances,
-      deleteInstance,
-      createInstance,
-      renameInstance,
-    };
-  },
-};
-// import { Options, Vue } from 'vue-class-component';
-
-// @Options({
-//   components: {
-//   },
-// })
-// export default class Instances extends Vue {}
+    this.instances = this.instances.map((instance) => (instance.name === oldName ? { name: newName } : instance));
+  }
+}
 </script>

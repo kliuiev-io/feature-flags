@@ -34,43 +34,36 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { useStore } from 'vuex';
+import { Options, Vue } from 'vue-class-component';
 
-export default defineComponent({
-  setup() {
-    const router = useRouter();
+@Options({})
+export default class App extends Vue {
+  private readonly links = [
+    ['/instances', 'Instances'],
+    ['/groups', 'Groups'],
+    ['/users', 'Users'],
+  ];
 
-    const currentPath = computed(() => router.currentRoute.value.path);
+  mounted() {
+    this.$store.dispatch('fetchInstances');
+  }
 
-    const links = [
-      ['/instances', 'Instances'],
-      ['/groups', 'Groups'],
-      ['/users', 'Users'],
-    ];
+  get currentPath() {
+    return this.$router.currentRoute.value.path;
+  }
 
-    const store = useStore();
+  get instances() {
+    return this.$store.state.instances;
+  }
 
-    onMounted(() => store.dispatch('fetchInstances'));
+  get currentInstance() {
+    return this.$store.state.currentInstance;
+  }
 
-    const instances = computed(() => store.state.instances);
-
-    const currentInstance = computed(() => store.state.currentInstance);
-
-    function changeInstance(instance: string) {
-      store.commit('SET_CURRENT_INSTANCE', instance);
-    }
-
-    return {
-      currentPath,
-      links,
-      instances,
-      currentInstance,
-      changeInstance,
-    };
-  },
-});
+  changeInstance(instance: string) {
+    this.$store.commit('SET_CURRENT_INSTANCE', instance);
+  }
+}
 </script>
 
 <style lang="scss">

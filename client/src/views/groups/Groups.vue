@@ -1,34 +1,33 @@
 <template>
   <div class="home">
     <div>Groups</div>
+
+    <el-table :data="instances" style="width: 100%">
+      <el-table-column prop="name" label="Name" />
+      <el-table-column fixed="right" label="Operations" width="350">
+        <template #default="scope">
+          <el-button type="primary" size="small" @click="renameInstance(scope.row.name)">Edit</el-button>
+          <el-button type="danger" size="small" @click="deleteInstance(scope.row.name)">Delete</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
   </div>
 </template>
 
 <script lang="ts">
-import { ref, onMounted } from 'vue';
 import { InstancesApi } from '@/api/instances';
+import { Options, Vue } from 'vue-class-component';
 
-export default {
-  setup() {
-    const instances = ref<string[]>([]);
+@Options({})
+export default class Groups extends Vue {
+  private instances: {name: string}[] = [];
 
-    async function fetchInstances() {
-      // instances = instances.slice();
-      instances.value = await InstancesApi.getInstances();
-    }
+  mounted() {
+    this.fetchInstances();
+  }
 
-    onMounted(fetchInstances);
-
-    return {
-      instances,
-    };
-  },
-};
-// import { Options, Vue } from 'vue-class-component';
-
-// @Options({
-//   components: {
-//   },
-// })
-// export default class Groups extends Vue {}
+  async fetchInstances(): Promise<void> {
+    this.instances = (await InstancesApi.getInstances()).map((instance) => ({ name: instance }));
+  }
+}
 </script>

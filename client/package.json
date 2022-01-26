@@ -51,7 +51,8 @@
       "ecmaVersion": 2020
     },
     "rules": {
-      "class-methods-use-this": "off"
+      "class-methods-use-this": "off",
+      "@typescript-eslint/explicit-module-boundary-types": "off"
     }
   },
   "browserslist": [
