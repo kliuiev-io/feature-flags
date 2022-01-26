@@ -57,7 +57,7 @@ export default class App extends Vue {
   }
 
   changeInstance(instance: string) {
-    this.$store.commit(`SET_CURRENT_INSTANCE`, instance);
+    this.$store.dispatch(`changeInstance`, instance);
   }
 }
 </script>

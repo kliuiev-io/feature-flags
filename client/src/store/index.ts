@@ -1,6 +1,8 @@
 import { InstancesApi } from '@/api/instances';
 import { createStore } from 'vuex';
 
+const STORAGE_INSTANCE_KEY = 'currentInstance';
+
 export default createStore({
   state: {
     currentInstance: null,
@@ -20,7 +22,19 @@ export default createStore({
 
       store.commit('SET_INSTANCES', instances);
 
-      if (instances.length) store.commit('SET_CURRENT_INSTANCE', instances[0]);
+      if (!instances.length) return;
+
+      if (instances.includes(localStorage.getItem(STORAGE_INSTANCE_KEY) || '')) {
+        store.commit('SET_CURRENT_INSTANCE', localStorage.getItem(STORAGE_INSTANCE_KEY));
+      } else {
+        store.commit('SET_CURRENT_INSTANCE', instances[0]);
+      }
     },
+
+    changeInstance(store, instance) {
+      store.commit('SET_CURRENT_INSTANCE', instance);
+      localStorage.setItem(STORAGE_INSTANCE_KEY, instance);
+      location.reload();
+    }
   },
 });
