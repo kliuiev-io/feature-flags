@@ -1,0 +1,35 @@
+{
+  "name": "feature-flags-package",
+  "version": "1.0.0",
+  "description": "Feature flags npm package (browser and nodejs) with TypeScript support",
+  "main": "dist/browser.js",
+  "scripts": {
+    "build": "./node_modules/typescript/bin/tsc",
+    "test": "jest ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kliuiev-io/FeatureFlags.git"
+  },
+  "keywords": [
+    "feature",
+    "flags",
+    "node.js",
+    "browser",
+    "client",
+    "typescript"
+  ],
+  "author": "kliuiev-io",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kliuiev-io/FeatureFlags/issues"
+  },
+  "homepage": "https://github.com/kliuiev-io/FeatureFlags#readme",
+  "devDependencies": {
+    "@types/node": "^17.0.12",
+    "typescript": "^4.5.5"
+  },
+  "peerDependencies": {
+    "node-fetch": "^3.2.0"
+  }
+}
