@@ -5,4 +5,11 @@ import router from './router';
 import store from './store';
 import 'element-plus/dist/index.css';
 
-createApp(App).use(store).use(router).use(Element).mount('#app');
+
+async function initialize() {
+  await store.dispatch('fetchInstances');
+  createApp(App).use(store).use(router).use(Element).mount('#app');
+}
+
+
+initialize();

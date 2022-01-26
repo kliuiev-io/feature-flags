@@ -39,14 +39,10 @@ import { Options, Vue } from 'vue-class-component';
 @Options({})
 export default class App extends Vue {
   private readonly links = [
-    ['/instances', 'Instances'],
-    ['/groups', 'Groups'],
-    ['/users', 'Users'],
+    [`/instances`, `Instances`],
+    [`/groups`, `Groups`],
+    [`/users`, `Users`],
   ];
-
-  mounted() {
-    this.$store.dispatch('fetchInstances');
-  }
 
   get currentPath() {
     return this.$router.currentRoute.value.path;
@@ -61,7 +57,7 @@ export default class App extends Vue {
   }
 
   changeInstance(instance: string) {
-    this.$store.commit('SET_CURRENT_INSTANCE', instance);
+    this.$store.commit(`SET_CURRENT_INSTANCE`, instance);
   }
 }
 </script>

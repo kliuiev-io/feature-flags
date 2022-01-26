@@ -52,7 +52,8 @@
     },
     "rules": {
       "class-methods-use-this": "off",
-      "@typescript-eslint/explicit-module-boundary-types": "off"
+      "@typescript-eslint/explicit-module-boundary-types": "off",
+      "quotes": ["error", "backtick"]
     }
   },
   "browserslist": [

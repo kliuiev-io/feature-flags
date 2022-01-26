@@ -39,7 +39,7 @@ export default class Instances extends Vue {
   }
 
   async createInstance() {
-    const name = prompt('Enter instance name:', 'instance-name');
+    const name = prompt(`Enter instance name:`, `instance-name`);
 
     if (!name) return;
 
@@ -49,7 +49,7 @@ export default class Instances extends Vue {
   }
 
   async renameInstance(oldName: string) {
-    const newName = prompt('Enter new instance name:', oldName);
+    const newName = prompt(`Enter new instance name:`, oldName);
 
     if (!newName) return;
 
