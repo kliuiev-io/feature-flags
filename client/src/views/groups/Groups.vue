@@ -3,8 +3,8 @@
     <h1>Groups <el-button round @click="createGroup">+</el-button></h1>
 
     <el-table :data="groups" style="width: 100%">
-      <el-table-column prop="id" label="ID" />
-      <el-table-column prop="name" label="Name" />
+      <el-table-column prop="id" label="ID" width="128" />
+      <el-table-column prop="name" label="Name" width="256" />
       <el-table-column prop="description" label="Description" />
       <el-table-column fixed="right" label="Operations" width="150">
         <template #default="scope">
