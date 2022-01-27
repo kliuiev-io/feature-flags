@@ -12,7 +12,7 @@ export class ClientService {
       await this.databaseService.instanceGetFlags(instance),
     )
       .filter((entry) => entry[1].defaultState)
-      .map((entry) => entry[1]);
+      .map((entry) => entry[1].id);
 
     if (!user) return instanceFlags;
 
