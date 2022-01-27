@@ -11,7 +11,7 @@
         :disable-transitions="false"
         @close="removeGroup(group)"
       >
-        {{ group }}
+        {{ getGroupById(group).name }}
       </el-tag>
       <el-select
         v-if="inputVisible"
@@ -77,6 +77,10 @@ export default class FlagsDialog extends Vue {
     return this.instanceGroups
       .filter((group) => !this.groups.includes(group.id))
       .map((group) => [group.id, group.description ? `${group.name} - ${group.description}` : group.name]);
+  }
+
+  getGroupById(groupId: string) {
+    return this.instanceGroups.find((group) => group.id === groupId);
   }
 
   async fetchGroups() {
