@@ -1,14 +1,13 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
-import Home from '../views/Home.vue';
-import Instances from '../views/instances/Instances.vue';
-import Groups from '../views/groups/Groups.vue';
-import Users from '../views/users/Users.vue';
+import Instances from '@/views/instances/Instances.vue';
+import Groups from '@/views/groups/Groups.vue';
+import Users from '@/views/users/Users.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'Home',
-    component: Home,
+    redirect: '/instances',
   },
   {
     path: '/instances',
