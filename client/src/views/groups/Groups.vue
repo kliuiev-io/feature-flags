@@ -8,7 +8,7 @@
       <el-table-column prop="description" label="Description" />
       <el-table-column prop="flags" label="Flags">
         <template #default="scope">
-          <el-tag type="primary" v-for="flag in scope.row.flags" :key="flag">{{flag}}</el-tag>
+          <el-tag v-for="flag in scope.row.flags" :key="flag">{{flag}}</el-tag>
         </template>
       </el-table-column>
       <el-table-column fixed="right" label="Operations" width="256">
