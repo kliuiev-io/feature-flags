@@ -5,13 +5,12 @@
         <el-menu
           :default-active="currentPath"
           mode="horizontal"
+          router
         >
           <li class="el-menu-item title"><b>Feature flags</b></li>
-          <el-menu-item v-for="link in links" :index="link[0]" :key="link[0]">
-            <router-link class="link" :to="link[0]">{{link[1]}}</router-link>
-          </el-menu-item>
+          <el-menu-item v-for="link in links" :index="link[0]" :key="link[0]">{{link[1]}}</el-menu-item>
 
-          <div style="margin-left: 45vw" class="instance-select">Current instance:&nbsp;&nbsp;</div>
+          <div style="margin-left: 40vw" class="instance-select">Current instance:&nbsp;&nbsp;</div>
 
           <el-select :model-value="currentInstance" @change="changeInstance" class="instance-select" placeholder="Select">
             <el-option
