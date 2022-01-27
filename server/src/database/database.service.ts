@@ -107,19 +107,19 @@ export class DatabaseService {
   }
 
   async userGetUsers(instance: string) {
-    this.throwIfInstanceDoesNotExist(instance);
+    await this.throwIfInstanceDoesNotExist(instance);
 
     return mockDatabase[instance].users;
   }
 
   async userGetByEmail(email: string, instance: string) {
-    this.throwIfInstanceDoesNotExist(instance);
+    await this.throwIfInstanceDoesNotExist(instance);
 
     return mockDatabase[instance].users.find((user) => user.email === email);
   }
 
   async userRegister(email: string, instance: string, groups: string[] = []) {
-    this.throwIfInstanceDoesNotExist(instance);
+    await this.throwIfInstanceDoesNotExist(instance);
 
     if (await this.userCheckExists(email, instance))
       throw new NotFoundException(
