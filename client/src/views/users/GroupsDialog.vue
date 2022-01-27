@@ -1,26 +1,26 @@
 <template>
-  <el-dialog :model-value="Boolean(user)" title="Edit flags"
+  <el-dialog :model-value="Boolean(user)" title="Edit groups"
     @close="close" @open="onOpen" >
 
-    <div class="taglist" @click.capture="onFlagCancel">
+    <div class="taglist" @click.capture="onGroupCancel">
       <el-tag
-        v-for="flag in flags"
-        :key="flag"
+        v-for="group in groups"
+        :key="group"
         class="mx-1"
         closable
         :disable-transitions="false"
-        @close="removeFlag(flag)"
+        @close="removeGroup(group)"
       >
-        {{ flag }}
+        {{ group }}
       </el-tag>
       <el-select
         v-if="inputVisible"
         filterable
         ref="InputRef"
         v-model="inputValue"
-        placeholder="Select a flag"
-        @change="onFlagAdd"
-        @keydown.esc.capture="onFlagCancel">
+        placeholder="Select a group"
+        @change="onGroupAdd"
+        @keydown.esc.capture="onGroupCancel">
         <el-option
           v-for="item in displayInstanceFlags"
           :key="item[0]"
@@ -29,8 +29,8 @@
         >
         </el-option>
       </el-select>
-      <el-button v-else class="button-new-tag" size="small" @click="addFlag">
-        + Add Flag
+      <el-button v-else class="button-new-tag" size="small" @click="addGroup">
+        + Add Group
       </el-button>
     </div>
 
@@ -41,8 +41,8 @@
 <script lang="ts">
 import { Options, Vue } from "vue-class-component";
 import { Edit, Delete } from '@element-plus/icons-vue';
-import { Flags, InstancesApi } from "@/api/instances";
 import { UsersApi } from "@/api/users";
+import { Group, GroupsApi } from "@/api/groups";
 
 @Options({
   components: { Edit, Delete },
@@ -51,22 +51,22 @@ import { UsersApi } from "@/api/users";
 export default class FlagsDialog extends Vue {
   private readonly user = ``;
 
-  private instanceFlags: Flags = {};
+  private instanceGroups: Group[] = [];
 
-  private flags: string[] = [];
+  private groups: string[] = [];
 
   private inputValue = ``;
 
   private inputVisible = false;
 
   close() {
-    this.flags = [];
-    this.onFlagCancel();
+    this.groups = [];
+    this.onGroupCancel();
     this.$emit(`update:user`, null);
   }
 
   onOpen() {
-    return this.fetchFlags();
+    return this.fetchGroups();
   }
 
   get instance() {
@@ -74,23 +74,23 @@ export default class FlagsDialog extends Vue {
   }
 
   get displayInstanceFlags() {
-    return Object.values(this.instanceFlags)
-      .filter((flag) => !this.flags.includes(flag.id))
-      .map((flag) => [flag.id, flag.description ? `${flag.id} - ${flag.description}` : flag.id]);
+    return this.instanceGroups
+      .filter((group) => !this.groups.includes(group.id))
+      .map((group) => [group.id, group.description ? `${group.name} - ${group.description}` : group.name]);
   }
 
-  async fetchFlags() {
-    this.instanceFlags = await InstancesApi.getFlags(this.instance);
+  async fetchGroups() {
+    this.instanceGroups = await GroupsApi.getGroups(this.instance);
 
-    this.flags = await UsersApi.getFlagsIds(this.user, this.instance);
+    this.groups = await UsersApi.getGroupsIds(this.user, this.instance);
   }
 
   async save() {
-    await UsersApi.setFlagsIds(this.user, this.instance, this.flags);
+    await UsersApi.setGroupsIds(this.user, this.instance, this.groups);
     this.close();
   }
 
-  addFlag() {
+  addGroup() {
     this.inputVisible = true;
 
     this.$nextTick(() => {
@@ -98,18 +98,18 @@ export default class FlagsDialog extends Vue {
     });
   }
 
-  removeFlag(flagToRemove: string) {
-    this.flags = this.flags.filter((flag) => flag !== flagToRemove);
+  removeGroup(flagToRemove: string) {
+    this.groups = this.groups.filter((flag) => flag !== flagToRemove);
   }
 
-  onFlagAdd() {
+  onGroupAdd() {
     if (!this.inputValue) return;
 
-    this.flags.push(this.inputValue);
-    this.onFlagCancel();
+    this.groups.push(this.inputValue);
+    this.onGroupCancel();
   }
 
-  onFlagCancel() {
+  onGroupCancel() {
     this.inputValue = ``;
     this.inputVisible = false;
   }

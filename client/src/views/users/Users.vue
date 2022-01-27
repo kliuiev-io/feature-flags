@@ -16,6 +16,7 @@
     </el-table>
 
     <flags-dialog v-model:user="editFlagsUser" @update:user="fetchUsers" />
+    <groups-dialog v-model:user="editGroupsUser" @update:user="fetchUsers" />
   </div>
   <el-empty description="Please select an Instance" />
 </template>
@@ -23,15 +24,18 @@
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
 import { User, UsersApi } from '@/api/users';
-import { alert, confirm, prompt } from '@/utils';
+import { confirm, prompt } from '@/utils';
 import { validateEmailRegexp } from '@/constants';
 import FlagsDialog from './FlagsDialog.vue';
+import GroupsDialog from './GroupsDialog.vue';
 
-@Options({ components: { FlagsDialog } })
+@Options({ components: { FlagsDialog, GroupsDialog } })
 export default class Users extends Vue {
   private users: User[] = [];
 
   private editFlagsUser: string | null = null;
+
+  private editGroupsUser: string | null = null;
 
   mounted() {
     this.fetchUsers();
@@ -59,7 +63,7 @@ export default class Users extends Vue {
   }
 
   async editGroups(email: string) {
-    await alert(`Not implemented`, `Not implemented yet`);
+    this.editGroupsUser = email;
   }
 
   async editFlags(email: string) {

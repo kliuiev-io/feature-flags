@@ -30,7 +30,7 @@
         </el-option>
       </el-select>
       <el-button v-else class="button-new-tag" size="small" @click="addFlag">
-        + New Tag
+        + Add Flag
       </el-button>
     </div>
 
