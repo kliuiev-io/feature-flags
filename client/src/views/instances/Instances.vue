@@ -38,16 +38,8 @@ export default class Instances extends Vue {
     const instances = await InstancesApi.getInstances();
 
     this.instances = instances.map((instance) => ({ name: instance }));
-  }
 
-  async deleteInstance(name: string) {
-    if (!await confirm(
-      `Delete instance`,
-      `Do you really want to delete instance ${name} and ALL ITS DATA (groups, users, flags)?`,
-    )) return;
-
-    await InstancesApi.deleteInstance(name);
-    this.instances = this.instances.filter((instance) => instance.name !== name);
+    await this.$store.dispatch(`fetchInstances`);
   }
 
   async createInstance() {
@@ -60,7 +52,7 @@ export default class Instances extends Vue {
 
     await InstancesApi.createInstance(name);
 
-    this.instances.push({ name });
+    await this.fetchInstances();
   }
 
   async renameInstance(oldName: string) {
@@ -73,7 +65,18 @@ export default class Instances extends Vue {
 
     await InstancesApi.renameInstance(oldName, newName);
 
-    this.instances = this.instances.map((instance) => (instance.name === oldName ? { name: newName } : instance));
+    await this.fetchInstances();
+  }
+
+  async deleteInstance(name: string) {
+    if (!await confirm(
+      `Delete instance`,
+      `Do you really want to delete instance ${name} and ALL ITS DATA (groups, users, flags)?`,
+    )) return;
+
+    await InstancesApi.deleteInstance(name);
+
+    await this.fetchInstances();
   }
 
   async editFlags(instance: string) {
