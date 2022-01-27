@@ -85,13 +85,7 @@ export default class FlagsDialog extends Vue {
 
     if (!name) return;
 
-    const description = await prompt(`Add flag`, `Enter flag description:`);
-
-    if (description === null) return;
-
-    const defaultState = await confirm(`Add flag`, `Choose flag default state:`, {}, `true`, `false`);
-
-    await InstancesApi.createFlag(name, this.instance, description, defaultState);
+    await InstancesApi.createFlag(name, this.instance, ``, false);
 
     await this.fetchFlags();
   }
