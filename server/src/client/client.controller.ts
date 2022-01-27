@@ -7,11 +7,16 @@ import { ClientService } from './client.service';
 export class ClientController {
   constructor(private readonly clientService: ClientService) {}
 
+  @Get(':instance')
+  async getFlags(@Param('instance') instance: string) {
+    return this.clientService.getFlags(null, instance);
+  }
+
   @Get(':instance/:email')
-  async getFlags(
+  async getFlagsUser(
     @Param('instance') instance: string,
     @Param('email') email: string,
   ) {
-    this.clientService.getFlags(email, instance);
+    return this.clientService.getFlags(email, instance);
   }
 }
