@@ -43,6 +43,7 @@ export default class App extends Vue {
     [`/instances`, `Instances`],
     [`/groups`, `Groups`],
     [`/users`, `Users`],
+    [`/client`, `Test client`],
   ];
 
   get currentPath() {
