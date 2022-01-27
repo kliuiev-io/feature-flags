@@ -62,8 +62,6 @@ import { validateFlagNameRegexp } from '@/constants';
 export default class FlagsDialog extends Vue {
   private readonly instance = `instance-name`;
 
-  private readonly testFlags = [{ name: `Test`, description: `Test flag`, defaultState: true }];
-
   private flags: Flags = {};
 
   close() {
