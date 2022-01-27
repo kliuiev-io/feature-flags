@@ -23,7 +23,13 @@ export class DatabaseService {
     mockDatabase[name] = {
       flags: {},
       groups: [],
-      users: [],
+      users: [
+        {
+          email: 'default',
+          flags: [],
+          groups: [],
+        },
+      ],
     };
   }
 
@@ -142,24 +148,32 @@ export class DatabaseService {
   }
 
   async userGetFlags(email: string, instance: string) {
+    this.throwIfUserDoesNotExist(email, instance);
+
     const user = await this.userGetByEmail(email, instance);
 
     return user.flags;
   }
 
   async userSetFlags(email: string, instance: string, flags: string[]) {
+    this.throwIfUserDoesNotExist(email, instance);
+
     const user = await this.userGetByEmail(email, instance);
 
     user.flags = flags;
   }
 
   async userGetGroups(email: string, instance: string) {
+    this.throwIfUserDoesNotExist(email, instance);
+
     const user = await this.userGetByEmail(email, instance);
 
     return user.groups;
   }
 
   async userSetGroups(email: string, instance: string, groups: string[]) {
+    this.throwIfUserDoesNotExist(email, instance);
+
     const user = await this.userGetByEmail(email, instance);
 
     user.groups = groups;
