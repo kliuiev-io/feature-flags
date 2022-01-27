@@ -23,13 +23,7 @@ export class DatabaseService {
     mockDatabase[name] = {
       flags: {},
       groups: [],
-      users: [
-        {
-          email: 'default',
-          flags: [],
-          groups: [],
-        },
-      ],
+      users: [],
     };
   }
 
