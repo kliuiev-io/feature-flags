@@ -6,21 +6,27 @@
       <el-table-column prop="name" label="Name" />
       <el-table-column fixed="right" label="Operations" width="350">
         <template #default="scope" width="100">
+          <el-button type="success" size="small" @click="editFlags(scope.row.name)">Flags</el-button>
           <el-button type="primary" size="small" @click="renameInstance(scope.row.name)">Edit</el-button>
           <el-button type="danger" size="small" @click="deleteInstance(scope.row.name)">Delete</el-button>
         </template>
       </el-table-column>
     </el-table>
+
+    <flags-dialog v-model:instance="editFlagsInstance" />
   </div>
 </template>
 
 <script lang="ts">
-import { InstancesApi } from '@/api/instances';
 import { Options, Vue } from 'vue-class-component';
+import { InstancesApi } from '@/api/instances';
+import FlagsDialog from './FlagsDialog.vue';
 
-@Options({})
+@Options({ components: { FlagsDialog } })
 export default class Instances extends Vue {
   instances: {name: string}[] = [];
+
+  editFlagsInstance: string | null = null;
 
   mounted() {
     this.fetchInstances();
@@ -56,6 +62,10 @@ export default class Instances extends Vue {
     await InstancesApi.renameInstance(oldName, newName);
 
     this.instances = this.instances.map((instance) => (instance.name === oldName ? { name: newName } : instance));
+  }
+
+  async editFlags(instance: string) {
+    this.editFlagsInstance = instance;
   }
 }
 </script>

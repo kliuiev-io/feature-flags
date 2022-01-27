@@ -1,5 +1,16 @@
 import { Api } from "./api";
 
+export interface FlagBase {
+  description: string;
+  defaultState: boolean;
+}
+
+export type Flag = FlagBase & {
+  id: string;
+};
+
+export type Flags = { [key: string]: Flag };
+
 export class InstancesApi {
   static getInstances = () => Api.get<string[]>(`instances/`);
 
@@ -9,7 +20,7 @@ export class InstancesApi {
 
   static deleteInstance = (instance: string) => Api.delete(`instances/${instance}`);
 
-  static getFlags = (instance: string) => Api.get(`instances/${instance}/flags`);
+  static getFlags = (instance: string) => Api.get<Flags>(`instances/${instance}/flags`);
 
   static createFlag = (name: string, instance: string, description: string, defaultState: boolean = false) => Api.post(`instances/${instance}/flags`, { name, description, defaultState });
 
