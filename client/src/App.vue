@@ -6,12 +6,12 @@
           :default-active="currentPath"
           mode="horizontal"
         >
-          <li class="el-menu-item"><el-link href="/"><b>Feature flags</b></el-link></li>
+          <li class="el-menu-item title"><b>Feature flags</b></li>
           <el-menu-item v-for="link in links" :index="link[0]" :key="link[0]">
-            <el-link :href="link[0]">{{link[1]}}</el-link>
+            <router-link class="link" :to="link[0]">{{link[1]}}</router-link>
           </el-menu-item>
 
-          <div style="margin-left: 48vw" class="instance-select">Current instance:&nbsp;&nbsp;</div>
+          <div style="margin-left: 45vw" class="instance-select">Current instance:&nbsp;&nbsp;</div>
 
           <el-select :model-value="currentInstance" @change="changeInstance" class="instance-select" placeholder="Select">
             <el-option
@@ -75,16 +75,13 @@ export default class App extends Vue {
   place-self: center;
 }
 
-// #nav {
-//   padding: 30px;
+.link {
+  text-decoration: none;
+}
 
-//   a {
-//     font-weight: bold;
-//     color: #2c3e50;
-
-//     &.router-link-exact-active {
-//       color: #42b983;
-//     }
-//   }
-// }
+.title:hover,
+.title:focus {
+  background-color: inherit !important;
+  cursor: default;
+}
 </style>
