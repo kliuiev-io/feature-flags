@@ -79,6 +79,18 @@ export default class App extends Vue {
   text-decoration: none;
 }
 
+.title::before {
+  $size: 24px;
+  background: url('./assets/logo.png');
+
+  content: '';
+  width: $size;
+  height: $size;
+  background-size: contain;
+  position: absolute;
+  left: -$size / 2;
+}
+
 .title:hover,
 .title:focus {
   background-color: inherit !important;
