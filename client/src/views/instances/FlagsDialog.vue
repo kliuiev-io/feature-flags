@@ -60,7 +60,7 @@ import { validateFlagNameRegexp } from '@/constants';
   props: { instance: { type: String } },
 })
 export default class FlagsDialog extends Vue {
-  private readonly instance = `instance-name`;
+  private readonly instance = ``;
 
   private flags: Flags = {};
 

@@ -8,12 +8,14 @@
       <el-table-column prop="flags" label="Flags" />
       <el-table-column fixed="right" label="Operations" width="256">
         <template #default="scope">
-          <el-button type="primary" size="small" @click="editGroups(scope.row.email)">Groups</el-button>
-          <el-button type="primary" size="small" @click="editFlags(scope.row.email)">Flags</el-button>
+          <el-button type="success" size="small" @click="editGroups(scope.row.email)">Groups</el-button>
+          <el-button type="success" size="small" @click="editFlags(scope.row.email)">Flags</el-button>
           <el-button type="danger" size="small" @click="deleteUser(scope.row.email)">Delete</el-button>
         </template>
       </el-table-column>
     </el-table>
+
+    <flags-dialog v-model:user="editFlagsUser" @update:user="fetchUsers" />
   </div>
   <el-empty description="Please select an Instance" />
 </template>
@@ -23,10 +25,13 @@ import { Options, Vue } from 'vue-class-component';
 import { User, UsersApi } from '@/api/users';
 import { alert, confirm, prompt } from '@/utils';
 import { validateEmailRegexp } from '@/constants';
+import FlagsDialog from './FlagsDialog.vue';
 
-@Options({})
+@Options({ components: { FlagsDialog } })
 export default class Users extends Vue {
   private users: User[] = [];
+
+  private editFlagsUser: string | null = null;
 
   mounted() {
     this.fetchUsers();
@@ -58,7 +63,7 @@ export default class Users extends Vue {
   }
 
   async editFlags(email: string) {
-    await alert(`Not implemented`, `Not implemented yet`);
+    this.editFlagsUser = email;
   }
 
   async deleteUser(email: string) {

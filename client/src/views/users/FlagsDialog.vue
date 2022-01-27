@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :model-value="Boolean(group)" title="Edit flags"
+  <el-dialog :model-value="Boolean(user)" title="Edit flags"
     @close="close" @open="onOpen" >
 
     <div class="taglist" @click.capture="onFlagCancel">
@@ -42,14 +42,14 @@
 import { Options, Vue } from "vue-class-component";
 import { Edit, Delete } from '@element-plus/icons-vue';
 import { Flags, InstancesApi } from "@/api/instances";
-import { GroupsApi } from "@/api/groups";
+import { UsersApi } from "@/api/users";
 
 @Options({
   components: { Edit, Delete },
-  props: { group: { type: String } },
+  props: { user: { type: String } },
 })
 export default class FlagsDialog extends Vue {
-  private readonly group = ``;
+  private readonly user = ``;
 
   private instanceFlags: Flags = {};
 
@@ -62,7 +62,7 @@ export default class FlagsDialog extends Vue {
   close() {
     this.flags = [];
     this.onFlagCancel();
-    this.$emit(`update:group`, null);
+    this.$emit(`update:user`, null);
   }
 
   onOpen() {
@@ -82,11 +82,11 @@ export default class FlagsDialog extends Vue {
   async fetchFlags() {
     this.instanceFlags = await InstancesApi.getFlags(this.instance);
 
-    this.flags = await GroupsApi.getFlags(this.group, this.instance);
+    this.flags = await UsersApi.getFlagsIds(this.user, this.instance);
   }
 
   async save() {
-    await GroupsApi.setFlags(this.group, this.instance, this.flags);
+    await UsersApi.setFlagsIds(this.user, this.instance, this.flags);
     this.close();
   }
 
