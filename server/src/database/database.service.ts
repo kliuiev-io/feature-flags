@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { generateId } from 'src/utils';
+import { generateId, validateEmail, validateFlagName, validateInstanceName } from 'src/utils';
 import { FlagBase, Flags, GroupBase, Instances } from './database.interface';
 
 const mockDatabase: Instances = {};
@@ -17,6 +17,8 @@ export class DatabaseService {
   }
 
   async instanceCreate(name: string) {
+    validateInstanceName(name);
+
     if (await this.instanceCheckExists('name'))
       throw new NotFoundException(`Instance ${name} already exists`);
 
@@ -42,6 +44,8 @@ export class DatabaseService {
     instance: string,
     { description, defaultState }: FlagBase,
   ) {
+    validateFlagName(flagName);
+
     if (await this.instanceFlagCheckExists(flagName, instance))
       throw new NotFoundException(
         `The flag ${flagName} is already exists in the instance ${instance}`,
@@ -96,6 +100,8 @@ export class DatabaseService {
   }
 
   async instanceRename(oldName: string, newName: string) {
+    validateInstanceName(newName);
+
     const flags = await this.instanceGetFlags(oldName);
     await this.instanceCreate(newName);
     await this.instanceSetFlags(newName, flags);
@@ -119,6 +125,8 @@ export class DatabaseService {
   }
 
   async userRegister(email: string, instance: string, groups: string[] = []) {
+    validateEmail(email);
+
     await this.throwIfInstanceDoesNotExist(instance);
 
     if (await this.userCheckExists(email, instance))
