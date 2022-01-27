@@ -70,6 +70,6 @@ export class UsersController {
     @Param('email') email: string,
     @Body() flagsDto: FlagsDto,
   ) {
-    return this.usersService.setGroups(email, instance, flagsDto.flags);
+    return this.usersService.setFlags(email, instance, flagsDto.flags);
   }
 }
