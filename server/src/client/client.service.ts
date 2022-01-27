@@ -8,9 +8,11 @@ export class ClientService {
   async getFlags(email: string, instance: string) {
     const user = await this.databaseService.userGetByEmail(email, instance);
 
-    const instanceFlags = Object.keys(
+    const instanceFlags = Object.entries(
       await this.databaseService.instanceGetFlags(instance),
-    );
+    )
+      .filter((entry) => entry[1].defaultState)
+      .map((entry) => entry[1]);
 
     if (!user) return instanceFlags;
 
