@@ -20,6 +20,8 @@
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
 import { InstancesApi } from '@/api/instances';
+import { confirm, prompt } from '@/utils';
+import { validateInstanceNameRegexp } from '@/constants';
 import FlagsDialog from './FlagsDialog.vue';
 
 @Options({ components: { FlagsDialog } })
@@ -39,13 +41,20 @@ export default class Instances extends Vue {
   }
 
   async deleteInstance(name: string) {
-    if (!confirm(`Do you really want to delete instance ${name} and ALL ITS DATA (groups, users, flags)?`)) return;
+    if (!await confirm(
+      `Delete instance`,
+      `Do you really want to delete instance ${name} and ALL ITS DATA (groups, users, flags)?`,
+    )) return;
+
     await InstancesApi.deleteInstance(name);
     this.instances = this.instances.filter((instance) => instance.name !== name);
   }
 
   async createInstance() {
-    const name = prompt(`Enter instance name:`, `instance-name`);
+    const name = await prompt(`Create instance`, `Enter instance name:`, `instance-name`, {
+      inputPattern: validateInstanceNameRegexp,
+      inputErrorMessage: `Invalid name`,
+    });
 
     if (!name) return;
 
@@ -55,7 +64,10 @@ export default class Instances extends Vue {
   }
 
   async renameInstance(oldName: string) {
-    const newName = prompt(`Enter new instance name:`, oldName);
+    const newName = await prompt(`Rename instance`, `Enter new instance name:`, oldName, {
+      inputPattern: validateInstanceNameRegexp,
+      inputErrorMessage: `Invalid name`,
+    });
 
     if (!newName) return;
 

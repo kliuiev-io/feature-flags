@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :model-value="Boolean(instance)" :title="`${instance} flags and defaults`"
+  <el-dialog :model-value="Boolean(instance)" :title="`Edit flags for ${instance}`"
     @close="close" @open="onOpen" >
     <el-table :data="Object.values(flags)">
       <el-table-column
@@ -49,9 +49,11 @@
 </template>
 
 <script lang="ts">
-import { Flags, InstancesApi } from "@/api/instances";
 import { Options, Vue } from "vue-class-component";
 import { Edit, Delete } from '@element-plus/icons-vue';
+import { Flags, InstancesApi } from "@/api/instances";
+import { confirm, prompt } from '@/utils';
+import { validateFlagNameRegexp } from '@/constants';
 
 @Options({
   components: { Edit, Delete },
@@ -78,15 +80,18 @@ export default class FlagsDialog extends Vue {
   }
 
   async addFlag() {
-    const name = prompt(`Enter flag name:`, `new-flag`);
+    const name = await prompt(`Add flag`, `Enter flag name:`, `new-flag`, {
+      inputPattern: validateFlagNameRegexp,
+      inputErrorMessage: `Invalid flag name`,
+    });
 
     if (!name) return;
 
-    const description = prompt(`Enter flag description:`);
+    const description = await prompt(`Add flag`, `Enter flag description:`);
 
     if (description === null) return;
 
-    const defaultState = confirm(`Choose flag default state (OK - true, Cancel - false):`);
+    const defaultState = await confirm(`Add flag`, `Choose flag default state:`, {}, `true`, `false`);
 
     await InstancesApi.createFlag(name, this.instance, description, defaultState);
 
@@ -96,7 +101,7 @@ export default class FlagsDialog extends Vue {
   async changeFlagDescription(id: string) {
     const flag = this.flags[id];
 
-    const description = prompt(`Enter new flag description:`, flag.description);
+    const description = await prompt(`Edit description`, `Enter new flag description:`, flag.description);
 
     if (description === null) return;
 
@@ -114,7 +119,10 @@ export default class FlagsDialog extends Vue {
   }
 
   async deleteFlag(id: string) {
-    if (!confirm(`Do you really want to delete flag ${id}? This will also delete all instances of this flag in any users and groups!`)) return;
+    if (!await confirm(
+      `Delete flag`,
+      `Do you really want to delete flag ${id}? This will also delete all instances of this flag in any users and groups!`,
+    )) return;
 
     await InstancesApi.deleteFlag(id, this.instance);
 

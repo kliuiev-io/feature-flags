@@ -20,7 +20,9 @@
 
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
-import { User, UsersApi } from '../../api/users';
+import { User, UsersApi } from '@/api/users';
+import { alert, confirm, prompt } from '@/utils';
+import { validateEmailRegexp } from '@/constants';
 
 @Options({})
 export default class Users extends Vue {
@@ -39,7 +41,10 @@ export default class Users extends Vue {
   }
 
   async registerUser() {
-    const email = prompt(`Enter email:`);
+    const email = await prompt(`Register user`, `Enter email:`, ``, {
+      inputPattern: validateEmailRegexp,
+      inputErrorMessage: `Invalid email`,
+    });
 
     if (!email) return;
 
@@ -49,15 +54,15 @@ export default class Users extends Vue {
   }
 
   async editGroups(email: string) {
-    alert('Not implemented yet');
+    await alert(`Not implemented`, `Not implemented yet`);
   }
 
   async editFlags(email: string) {
-    alert('Not implemented yet');
+    await alert(`Not implemented`, `Not implemented yet`);
   }
 
   async deleteUser(email: string) {
-    if (!confirm(`Do you really want to relete the user ${email}?`)) return;
+    if (!await confirm(`Delete user`, `Do you really want to relete the user ${email}?`)) return;
 
     await UsersApi.deleteUser(email, this.instance);
 

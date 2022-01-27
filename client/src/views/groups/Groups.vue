@@ -18,8 +18,9 @@
 </template>
 
 <script lang="ts">
-import { GroupsApi, Group } from '@/api/groups';
 import { Options, Vue } from 'vue-class-component';
+import { GroupsApi, Group } from '@/api/groups';
+import { confirm, prompt } from '@/utils';
 
 @Options({})
 export default class Groups extends Vue {
@@ -38,11 +39,11 @@ export default class Groups extends Vue {
   }
 
   async createGroup() {
-    const name = prompt(`Enter group name:`, `New group`);
+    const name = await prompt(`Create group`, `Enter group name:`, `New group`);
 
     if (!name) return;
 
-    const description = prompt(`Enter group description`);
+    const description = await prompt(`Create group`, `Enter group description`);
 
     if (description === null) return;
 
@@ -52,11 +53,11 @@ export default class Groups extends Vue {
   }
 
   async editGroup(group: Group) {
-    const name = prompt(`Enter group's new name:`, group.name);
+    const name = await prompt(`Edit group`, `Enter group's new name:`, group.name);
 
     if (!name) return;
 
-    const description = prompt(`Enter group's new description`, group.description);
+    const description = await prompt(`Edit group`, `Enter group's new description`, group.description);
 
     if (description === null) return;
 
@@ -66,7 +67,7 @@ export default class Groups extends Vue {
   }
 
   async deleteGroup(groupId: string) {
-    if (!confirm(`Do you really want to relete the group?`)) return;
+    if (!await confirm(`Delete group`, `Do you really want to relete the group?`)) return;
 
     await GroupsApi.deleteGroup(groupId, this.instance);
 
