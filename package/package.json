@@ -1,6 +1,6 @@
 {
-  "name": "feature-flags-package",
-  "version": "1.0.0",
+  "name": "fflags",
+  "version": "1.0.1",
   "description": "Feature flags npm package (browser and nodejs) with TypeScript support",
   "main": "dist/browser.js",
   "scripts": {
