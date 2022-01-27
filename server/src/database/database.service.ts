@@ -48,7 +48,7 @@ export class DatabaseService {
       );
 
     mockDatabase[instance].flags[flagName] = {
-      id: generateId(),
+      id: flagName,
       description,
       defaultState,
     };
