@@ -1,0 +1,5 @@
+{
+  "type": "postgres",
+  "url": "postgres://...",
+  "entities": ["dist/**/*.entity{.ts,.js}"]
+}

@@ -1,11 +1,32 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { generateId, validateEmail, validateFlagName, validateInstanceName } from 'src/utils';
+import { InjectRepository } from '@nestjs/typeorm';
+import {
+  generateId,
+  validateEmail,
+  validateFlagName,
+  validateInstanceName,
+} from 'src/utils';
+import { Repository } from 'typeorm';
 import { FlagBase, Flags, GroupBase, Instances } from './database.interface';
+import { Flag } from './entities/Flag.entity';
+import { Group } from './entities/Group.entity';
+import { Instance } from './entities/Instance.entity';
+import { User } from './entities/User.entity';
 
 const mockDatabase: Instances = {};
 
 @Injectable()
 export class DatabaseService {
+  constructor(
+    @InjectRepository(User)
+    private readonly usersRepository: Repository<User>,
+    @InjectRepository(Group)
+    private readonly groupsRepository: Repository<Group>,
+    @InjectRepository(Instance)
+    private readonly instancesRepository: Repository<Instance>,
+    @InjectRepository(Flag) private readonly flagsRepository: Repository<Flag>,
+  ) {}
+
   async instanceFlagCheckExists(flagName: string, instance: string) {
     await this.throwIfInstanceDoesNotExist(instance);
 
@@ -117,6 +138,12 @@ export class DatabaseService {
 
     return mockDatabase[instance].users;
   }
+  // async userGetUsers(instance: string) {
+  //   // await this.throwIfInstanceDoesNotExist(instance);
+  //   return await this.usersRepository.find();
+
+  //   return mockDatabase[instance].users;
+  // }
 
   async userGetByEmail(email: string, instance: string) {
     await this.throwIfInstanceDoesNotExist(instance);
