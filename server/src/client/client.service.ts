@@ -12,19 +12,17 @@ export class ClientService {
       await this.databaseService.instanceGetFlags(instance),
     )
       .filter((entry) => entry[1].defaultState)
-      .map((entry) => entry[1].id);
+      .map((entry) => entry[1].name);
 
     if (!user) return instanceFlags;
 
-    const userFlags = await this.databaseService.userGetFlags(email, instance);
+    const userFlags = (
+      await this.databaseService.userGetFlags(email, instance)
+    ).map((flag) => flag.name);
 
-    const groupFlags = [];
-
-    for (const group of user.groups) {
-      groupFlags.push(
-        ...(await this.databaseService.groupGetFlags(group, instance)),
-      );
-    }
+    const groupFlags = user.groups
+      .map((group) => group.flags.map((flag) => flag.name))
+      .flat();
 
     return Array.from(new Set([...userFlags, ...groupFlags, ...instanceFlags]));
   }

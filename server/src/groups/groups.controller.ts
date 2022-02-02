@@ -25,7 +25,7 @@ export class GroupsController {
   @Get(':instance/:id')
   async getGroup(
     @Param('instance') instance: string,
-    @Param('id') groupId: string,
+    @Param('id') groupId: number,
   ) {
     return this.groupsService.getGroup(groupId, instance);
   }
@@ -45,7 +45,7 @@ export class GroupsController {
   @Put(':instance/:id')
   async updateGroup(
     @Param('instance') instance: string,
-    @Param('id') groupId: string,
+    @Param('id') groupId: number,
     @Body() groupBaseDto: GroupBaseDto,
   ) {
     this.groupsService.updateGroup(
@@ -59,7 +59,7 @@ export class GroupsController {
   @Delete(':instance/:id')
   async deleteGroup(
     @Param('instance') instance: string,
-    @Param('id') groupId: string,
+    @Param('id') groupId: number,
   ) {
     this.groupsService.deleteGroup(groupId, instance);
   }
@@ -67,7 +67,7 @@ export class GroupsController {
   @Get(':instance/:id/flags')
   async getFlags(
     @Param('instance') instance: string,
-    @Param('id') groupId: string,
+    @Param('id') groupId: number,
   ) {
     return this.groupsService.getFlags(groupId, instance);
   }
@@ -75,7 +75,7 @@ export class GroupsController {
   @Put(':instance/:id/flags')
   async setFlags(
     @Param('instance') instance: string,
-    @Param('id') groupId: string,
+    @Param('id') groupId: number,
     @Body() flagsDto: FlagsDto,
   ) {
     this.groupsService.setFlags(groupId, instance, flagsDto.flags);

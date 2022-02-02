@@ -9,7 +9,7 @@ export class GroupsService {
     return this.databaseService.groupGetGroups(instance);
   }
 
-  async getGroup(groupId: string, instance: string) {
+  async getGroup(groupId: number, instance: string) {
     return this.databaseService.groupGetById(groupId, instance);
   }
 
@@ -18,7 +18,7 @@ export class GroupsService {
   }
 
   async updateGroup(
-    groupId: string,
+    groupId: number,
     name: string,
     description: string,
     instance: string,
@@ -30,15 +30,15 @@ export class GroupsService {
     );
   }
 
-  async deleteGroup(groupId: string, instance: string) {
+  async deleteGroup(groupId: number, instance: string) {
     return this.databaseService.groupDelete(groupId, instance);
   }
 
-  async getFlags(groupId: string, instance: string) {
+  async getFlags(groupId: number, instance: string) {
     return this.databaseService.groupGetFlags(groupId, instance);
   }
 
-  async setFlags(groupId: string, instance: string, flags: string[]) {
+  async setFlags(groupId: number, instance: string, flags: string[]) {
     return this.databaseService.groupSetFlags(groupId, instance, flags);
   }
 }
