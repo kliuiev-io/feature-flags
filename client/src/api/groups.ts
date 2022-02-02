@@ -1,4 +1,5 @@
 import { Api } from "./api";
+import { Flag } from "./instances";
 
 export interface GroupBase {
   name: string;
@@ -6,22 +7,22 @@ export interface GroupBase {
 }
 
 export type Group = GroupBase & {
-  id: string;
+  id: number;
   flags: string[];
 };
 
 export class GroupsApi {
   static getGroups = (instance: string) => Api.get<Group[]>(`groups/${instance}`);
 
-  static getGroup = (groupId: string, instance: string) => Api.get<Group>(`groups/${instance}/${groupId}`);
+  static getGroup = (groupId: number, instance: string) => Api.get<Group>(`groups/${instance}/${groupId}`);
 
   static createGroup = (instance: string, name: string, description: string) => Api.post(`groups/${instance}`, { name, description });
 
-  static updateGroup = (groupId: string, instance: string, name: string, description: string) => Api.put(`groups/${instance}/${groupId}`, { name, description });
+  static updateGroup = (groupId: number, instance: string, name: string, description: string) => Api.put(`groups/${instance}/${groupId}`, { name, description });
 
-  static deleteGroup = (groupId: string, instance: string) => Api.delete(`groups/${instance}/${groupId}`);
+  static deleteGroup = (groupId: number, instance: string) => Api.delete(`groups/${instance}/${groupId}`);
 
-  static getFlags = (groupId: string, instance: string) => Api.get<string[]>(`groups/${instance}/${groupId}/flags`);
+  static getFlagsNames = (groupId: number, instance: string) => Api.get<string[]>(`groups/${instance}/${groupId}/flags`);
 
-  static setFlags = (groupId: string, instance: string, flags: string[]) => Api.put(`groups/${instance}/${groupId}/flags`, { flags });
+  static setFlagsNames = (groupId: number, instance: string, flags: string[]) => Api.put(`groups/${instance}/${groupId}/flags`, { flags });
 }

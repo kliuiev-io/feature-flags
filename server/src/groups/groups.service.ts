@@ -35,7 +35,9 @@ export class GroupsService {
   }
 
   async getFlags(groupId: number, instance: string) {
-    return this.databaseService.groupGetFlags(groupId, instance);
+    return (await this.databaseService.groupGetFlags(groupId, instance)).map(
+      (flag) => flag.name,
+    );
   }
 
   async setFlags(groupId: number, instance: string, flags: string[]) {

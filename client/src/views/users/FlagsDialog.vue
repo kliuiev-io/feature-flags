@@ -41,7 +41,7 @@
 <script lang="ts">
 import { Options, Vue } from "vue-class-component";
 import { Edit, Delete } from '@element-plus/icons-vue';
-import { Flags, InstancesApi } from "@/api/instances";
+import { Flag, InstancesApi } from "@/api/instances";
 import { UsersApi } from "@/api/users";
 
 @Options({
@@ -51,7 +51,7 @@ import { UsersApi } from "@/api/users";
 export default class FlagsDialog extends Vue {
   private readonly user = ``;
 
-  private instanceFlags: Flags = {};
+  private instanceFlags: Flag[] = [];
 
   private flags: string[] = [];
 
@@ -74,19 +74,19 @@ export default class FlagsDialog extends Vue {
   }
 
   get displayInstanceFlags() {
-    return Object.values(this.instanceFlags)
-      .filter((flag) => !this.flags.includes(flag.id))
-      .map((flag) => [flag.id, flag.description ? `${flag.id} - ${flag.description}` : flag.id]);
+    return this.instanceFlags
+      .filter((flag) => !this.flags.includes(flag.name))
+      .map((flag) => [flag.name, flag.description ? `${flag.name} - ${flag.description}` : flag.name]);
   }
 
   async fetchFlags() {
     this.instanceFlags = await InstancesApi.getFlags(this.instance);
 
-    this.flags = await UsersApi.getFlagsIds(this.user, this.instance);
+    this.flags = await UsersApi.getFlagsNames(this.user, this.instance);
   }
 
   async save() {
-    await UsersApi.setFlagsIds(this.user, this.instance, this.flags);
+    await UsersApi.setFlagsNames(this.user, this.instance, this.flags);
     this.close();
   }
 

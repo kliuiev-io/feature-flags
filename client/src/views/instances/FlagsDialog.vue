@@ -3,8 +3,8 @@
     @close="close" @open="onOpen" >
     <el-table :data="Object.values(flags)">
       <el-table-column
-        property="id"
-        label="ID"
+        property="name"
+        label="Name"
         width="256"
       ></el-table-column>
       <el-table-column
@@ -13,7 +13,7 @@
       >
         <template #default="scope">
           {{scope.row.description}}
-          <el-button circle @click="changeFlagDescription(scope.row.id)">
+          <el-button circle @click="changeFlagDescription(scope.row.name)">
             <el-icon><edit /></el-icon>
           </el-button>
         </template>
@@ -25,7 +25,7 @@
       >
         <template #default="scope">
           <el-switch
-            @change="toggleFlagState(scope.row.id)"
+            @change="toggleFlagState(scope.row.name)"
             :model-value="scope.row.defaultState"
             active-color="#13ce66"
             inactive-color="#ff4949"
@@ -37,7 +37,7 @@
         width="100"
       >
         <template #default="scope">
-          <el-button circle type="danger" @click="deleteFlag(scope.row.id)">
+          <el-button circle type="danger" @click="deleteFlag(scope.row.name)">
             <el-icon><delete /></el-icon>
           </el-button>
         </template>
@@ -51,7 +51,7 @@
 <script lang="ts">
 import { Options, Vue } from "vue-class-component";
 import { Edit, Delete } from '@element-plus/icons-vue';
-import { Flags, InstancesApi } from "@/api/instances";
+import { Flag, InstancesApi } from "@/api/instances";
 import { confirm, prompt } from '@/utils';
 import { validateFlagNameRegexp } from '@/constants';
 
@@ -62,10 +62,10 @@ import { validateFlagNameRegexp } from '@/constants';
 export default class FlagsDialog extends Vue {
   private readonly instance = ``;
 
-  private flags: Flags = {};
+  private flags: Flag[] = [];
 
   close() {
-    this.flags = {};
+    this.flags = [];
     this.$emit(`update:instance`, null);
   }
 
@@ -90,33 +90,37 @@ export default class FlagsDialog extends Vue {
     await this.fetchFlags();
   }
 
-  async changeFlagDescription(id: string) {
-    const flag = this.flags[id];
+  async changeFlagDescription(name: string) {
+    const flag = this.flags.find((_flag) => _flag.name === name);
+
+    if (!flag) throw new Error();
 
     const description = await prompt(`Edit description`, `Enter new flag description:`, flag.description);
 
     if (description === null) return;
 
-    await InstancesApi.updateFlag(id, this.instance, description, flag.defaultState);
+    await InstancesApi.updateFlag(name, this.instance, description, flag.defaultState);
 
     await this.fetchFlags();
   }
 
-  async toggleFlagState(id: string) {
-    const flag = this.flags[id];
+  async toggleFlagState(name: string) {
+    const flag = this.flags.find((_flag) => _flag.name === name);
 
-    await InstancesApi.updateFlag(id, this.instance, flag.description, !flag.defaultState);
+    if (!flag) throw new Error();
+
+    await InstancesApi.updateFlag(name, this.instance, flag.description, !flag.defaultState);
 
     await this.fetchFlags();
   }
 
-  async deleteFlag(id: string) {
+  async deleteFlag(name: string) {
     if (!await confirm(
       `Delete flag`,
-      `Do you really want to delete flag ${id}? This will also delete all instances of this flag in any users and groups!`,
+      `Do you really want to delete flag ${name}? This will also delete all instances of this flag in any users and groups!`,
     )) return;
 
-    await InstancesApi.deleteFlag(id, this.instance);
+    await InstancesApi.deleteFlag(name, this.instance);
 
     await this.fetchFlags();
   }

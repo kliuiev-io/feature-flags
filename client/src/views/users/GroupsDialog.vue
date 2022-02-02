@@ -53,7 +53,7 @@ export default class FlagsDialog extends Vue {
 
   private instanceGroups: Group[] = [];
 
-  private groups: string[] = [];
+  private groups: number[] = [];
 
   private inputValue = ``;
 
@@ -79,14 +79,14 @@ export default class FlagsDialog extends Vue {
       .map((group) => [group.id, group.description ? `${group.name} - ${group.description}` : group.name]);
   }
 
-  getGroupById(groupId: string) {
+  getGroupById(groupId: number) {
     return this.instanceGroups.find((group) => group.id === groupId);
   }
 
   async fetchGroups() {
     this.instanceGroups = await GroupsApi.getGroups(this.instance);
 
-    this.groups = await UsersApi.getGroupsIds(this.user, this.instance);
+    this.groups = (await UsersApi.getGroups(this.user, this.instance)).map((group) => group.id);
   }
 
   async save() {
@@ -102,14 +102,14 @@ export default class FlagsDialog extends Vue {
     });
   }
 
-  removeGroup(flagToRemove: string) {
-    this.groups = this.groups.filter((flag) => flag !== flagToRemove);
+  removeGroup(groupToRemove: number) {
+    this.groups = this.groups.filter((flag) => flag !== groupToRemove);
   }
 
   onGroupAdd() {
     if (!this.inputValue) return;
 
-    this.groups.push(this.inputValue);
+    this.groups.push(Number(this.inputValue));
     this.onGroupCancel();
   }
 

@@ -1,13 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
-  generateId,
   validateEmail,
   validateFlagName,
   validateInstanceName,
 } from 'src/utils';
 import { Repository } from 'typeorm';
-import { FlagBase, Flags, GroupBase } from './database.interface';
+import { FlagBase, GroupBase } from './database.interface';
 import { Flag } from './entities/Flag.entity';
 import { Group } from './entities/Group.entity';
 import { Instance } from './entities/Instance.entity';
@@ -30,22 +29,23 @@ export class DatabaseService {
 
     return Boolean(
       await this.flagsRepository.findOne({
-        where: { instance: { name: instance }, name: flagName },
+        instance: { name: instance },
+        name: flagName,
       }),
     );
   }
 
   async instanceCheckExists(name: string) {
-    return Boolean(this.instancesRepository.findOne(name));
+    return Boolean(await this.instancesRepository.findOne(name));
   }
 
   async instanceCreate(name: string) {
     validateInstanceName(name);
 
-    if (await this.instanceCheckExists('name'))
+    if (await this.instanceCheckExists(name))
       throw new NotFoundException(`Instance ${name} already exists`);
 
-    await this.instancesRepository.create({ name });
+    await this.instancesRepository.insert({ name });
   }
 
   async instanceGetInstances() {
@@ -73,7 +73,7 @@ export class DatabaseService {
         `The flag ${flagName} is already exists in the instance ${instance}`,
       );
 
-    await this.flagsRepository.create({
+    await this.flagsRepository.insert({
       name: flagName,
       description,
       instance: { name: instance },
@@ -102,8 +102,6 @@ export class DatabaseService {
 
   async instanceFlagDelete(flagName: string, instance: string) {
     await this.throwIfInstanceFlagDoesNotExist(flagName, instance);
-
-    // TODO: Remove flag from all groups and users
 
     await this.flagsRepository.delete({
       instance: { name: instance },
@@ -136,15 +134,21 @@ export class DatabaseService {
   async userGetUsers(instance: string) {
     await this.throwIfInstanceDoesNotExist(instance);
 
-    return await this.usersRepository.find({ instance: { name: instance } });
+    return await this.usersRepository.find({
+      relations: ['groups', 'flags'],
+      where: { instance: { name: instance } },
+    });
   }
 
   async userGetByEmail(email: string, instance: string) {
     await this.throwIfInstanceDoesNotExist(instance);
 
     return this.usersRepository.findOne({
-      instance: { name: instance },
-      email,
+      relations: ['groups', 'flags'],
+      where: {
+        instance: { name: instance },
+        email,
+      },
     });
   }
 
@@ -158,7 +162,7 @@ export class DatabaseService {
         `User ${email} already exists in instance ${instance}`,
       );
 
-    await this.usersRepository.create({
+    await this.usersRepository.insert({
       instance: { name: instance },
       email,
     });
@@ -175,18 +179,28 @@ export class DatabaseService {
 
     const user = await this.userGetByEmail(email, instance);
 
-    return user.flags;
+    return user.flags.map((flag) => flag.name);
   }
 
   async userSetFlags(email: string, instance: string, flags: string[]) {
     this.throwIfUserDoesNotExist(email, instance);
 
-    await this.usersRepository.update(
-      { instance: { name: instance }, email },
-      {
-        flags: flags.map((name) => ({ name })),
-      },
-    );
+    const user = await this.userGetByEmail(email, instance);
+
+    const dbFlags = (
+      await Promise.all(
+        flags.map((flag) => {
+          return this.flagsRepository.find({
+            instance: { name: instance },
+            name: flag,
+          });
+        }),
+      )
+    ).flat();
+
+    user.flags = dbFlags;
+
+    await this.usersRepository.save(user);
   }
 
   async userGetGroups(email: string, instance: string) {
@@ -197,15 +211,16 @@ export class DatabaseService {
     return user.groups;
   }
 
-  async userSetGroups(email: string, instance: string, groups: string[]) {
+  async userSetGroups(email: string, instance: string, groups: number[]) {
     this.throwIfUserDoesNotExist(email, instance);
 
-    await this.usersRepository.update(
-      { instance: { name: instance }, email },
-      {
-        groups: groups.map((name) => ({ name })),
-      },
-    );
+    const user = await this.userGetByEmail(email, instance);
+
+    const dbGroups = await this.groupsRepository.findByIds(groups);
+
+    user.groups = dbGroups;
+
+    await this.usersRepository.save(user);
   }
 
   async groupCheckExists(groupId: number, instance: string) {
@@ -215,19 +230,24 @@ export class DatabaseService {
   async groupGetById(groupId: number, instance: string) {
     await this.throwIfInstanceDoesNotExist(instance);
 
-    return this.groupsRepository.findOne(groupId);
+    return this.groupsRepository.findOne(groupId, {
+      relations: ['users', 'flags'],
+    });
   }
 
   async groupGetGroups(instance: string) {
     await this.throwIfInstanceDoesNotExist(instance);
 
-    return this.groupsRepository.find({ instance: { name: instance } });
+    return this.groupsRepository.find({
+      relations: ['users', 'flags'],
+      where: { instance: { name: instance } },
+    });
   }
 
   async groupAdd({ name, description }: GroupBase, instance: string) {
     await this.throwIfInstanceDoesNotExist(instance);
 
-    await this.groupsRepository.create({
+    await this.groupsRepository.insert({
       name,
       description,
       instance: { name: instance },
@@ -268,12 +288,24 @@ export class DatabaseService {
   async groupSetFlags(groupId: number, instance: string, flags: string[]) {
     await this.throwIfGroupDoesNotExist(groupId, instance);
 
-    await this.groupsRepository.update(
-      { id: groupId },
-      {
-        flags: flags.map((name) => ({ name })),
-      },
-    );
+    // TODO: This is not an efficient way to do it
+
+    const group = await this.groupGetById(groupId, instance);
+
+    const dbFlags = (
+      await Promise.all(
+        flags.map((flag) => {
+          return this.flagsRepository.find({
+            instance: { name: instance },
+            name: flag,
+          });
+        }),
+      )
+    ).flat();
+
+    group.flags = dbFlags;
+
+    await this.groupsRepository.save(group);
   }
 
   private async throwIfInstanceDoesNotExist(name: string) {

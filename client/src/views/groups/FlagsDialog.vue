@@ -41,17 +41,17 @@
 <script lang="ts">
 import { Options, Vue } from "vue-class-component";
 import { Edit, Delete } from '@element-plus/icons-vue';
-import { Flags, InstancesApi } from "@/api/instances";
+import { Flag, InstancesApi } from "@/api/instances";
 import { GroupsApi } from "@/api/groups";
 
 @Options({
   components: { Edit, Delete },
-  props: { group: { type: String } },
+  props: { group: { type: Number } },
 })
 export default class FlagsDialog extends Vue {
-  private readonly group = ``;
+  private readonly group!: number;
 
-  private instanceFlags: Flags = {};
+  private instanceFlags: Flag[] = [];
 
   private flags: string[] = [];
 
@@ -74,19 +74,19 @@ export default class FlagsDialog extends Vue {
   }
 
   get displayInstanceFlags() {
-    return Object.values(this.instanceFlags)
-      .filter((flag) => !this.flags.includes(flag.id))
-      .map((flag) => [flag.id, flag.description ? `${flag.id} - ${flag.description}` : flag.id]);
+    return this.instanceFlags
+      .filter((flag) => !this.flags.includes(flag.name))
+      .map((flag) => [flag.name, flag.description ? `${flag.name} - ${flag.description}` : flag.name]);
   }
 
   async fetchFlags() {
     this.instanceFlags = await InstancesApi.getFlags(this.instance);
 
-    this.flags = await GroupsApi.getFlags(this.group, this.instance);
+    this.flags = await GroupsApi.getFlagsNames(this.group, this.instance);
   }
 
   async save() {
-    await GroupsApi.setFlags(this.group, this.instance, this.flags);
+    await GroupsApi.setFlagsNames(this.group, this.instance, this.flags);
     this.close();
   }
 

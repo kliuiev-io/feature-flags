@@ -1,11 +1,11 @@
 import {
+  AfterLoad,
   Column,
   Entity,
   JoinTable,
   ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
-  RelationId,
 } from 'typeorm';
 import { Flag } from './Flag.entity';
 import { Group } from './Group.entity';
@@ -25,11 +25,28 @@ export class User {
   })
   instance: Instance;
 
-  @ManyToMany(() => Group, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+  @ManyToMany(() => Group, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   @JoinTable()
   groups: Group[];
 
-  @ManyToMany(() => Flag, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+  @ManyToMany(() => Flag, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   @JoinTable()
   flags: Flag[];
+
+  @AfterLoad()
+  async nullChecks() {
+    if (!this.groups) {
+      this.groups = [];
+    }
+
+    if (!this.flags) {
+      this.flags = [];
+    }
+  }
 }

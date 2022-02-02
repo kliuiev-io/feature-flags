@@ -4,8 +4,16 @@
 
     <el-table :data="users" style="width: 100%">
       <el-table-column prop="email" label="Email" />
-      <el-table-column prop="groups" label="Groups" />
-      <el-table-column prop="flags" label="Flags" />
+      <el-table-column prop="groups" label="Groups">
+        <template #default="scope">
+          <el-tag v-for="group in scope.row.groups" :key="group.name">{{group.name}}</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column prop="flags" label="Flags">
+        <template #default="scope">
+          <el-tag v-for="flag in scope.row.flags" :key="flag.name">{{flag.name}}</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column fixed="right" label="Operations" width="256">
         <template #default="scope">
           <el-button type="success" size="small" @click="editGroups(scope.row.email)">Groups</el-button>
@@ -18,7 +26,7 @@
     <flags-dialog v-model:user="editFlagsUser" @update:user="fetchUsers" />
     <groups-dialog v-model:user="editGroupsUser" @update:user="fetchUsers" />
   </div>
-  <el-empty description="Please select an Instance" />
+  <el-empty v-else description="Please select an Instance" />
 </template>
 
 <script lang="ts">

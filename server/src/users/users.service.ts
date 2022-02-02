@@ -21,7 +21,7 @@ export class UsersService {
     return this.databaseService.userGetGroups(email, instance);
   }
 
-  async setGroups(email: string, instance: string, groups: string[]) {
+  async setGroups(email: string, instance: string, groups: number[]) {
     return this.databaseService.userSetGroups(email, instance, groups);
   }
 

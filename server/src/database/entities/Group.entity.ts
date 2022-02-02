@@ -1,4 +1,5 @@
 import {
+  AfterLoad,
   Column,
   Entity,
   JoinTable,
@@ -27,11 +28,28 @@ export class Group {
   })
   instance: Instance;
 
-  @ManyToMany(() => User, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+  @ManyToMany(() => User, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   @JoinTable()
   users: User[];
 
-  @ManyToMany(() => Flag, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+  @ManyToMany(() => Flag, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   @JoinTable()
   flags: Flag[];
+
+  @AfterLoad()
+  async nullChecks() {
+    if (!this.users) {
+      this.users = [];
+    }
+
+    if (!this.flags) {
+      this.flags = [];
+    }
+  }
 }

@@ -16,9 +16,7 @@ export class ClientService {
 
     if (!user) return instanceFlags;
 
-    const userFlags = (
-      await this.databaseService.userGetFlags(email, instance)
-    ).map((flag) => flag.name);
+    const userFlags = await this.databaseService.userGetFlags(email, instance);
 
     const groupFlags = user.groups
       .map((group) => group.flags.map((flag) => flag.name))

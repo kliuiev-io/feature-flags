@@ -18,7 +18,7 @@ export default createStore({
   },
   actions: {
     async fetchInstances(store) {
-      const instances = await InstancesApi.getInstances();
+      const instances = (await InstancesApi.getInstances()).map(instance => instance.name);
 
       store.commit('SET_INSTANCES', instances);
 

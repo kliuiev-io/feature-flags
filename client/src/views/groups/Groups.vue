@@ -8,7 +8,7 @@
       <el-table-column prop="description" label="Description" />
       <el-table-column prop="flags" label="Flags">
         <template #default="scope">
-          <el-tag v-for="flag in scope.row.flags" :key="flag">{{flag}}</el-tag>
+          <el-tag v-for="flag in scope.row.flags" :key="flag.name">{{flag.name}}</el-tag>
         </template>
       </el-table-column>
       <el-table-column fixed="right" label="Operations" width="256">
@@ -22,7 +22,7 @@
 
     <flags-dialog v-model:group="editFlagsGroup" @update:group="fetchGroups" />
   </div>
-  <el-empty description="Please select an Instance" />
+  <el-empty v-else description="Please select an Instance" />
 </template>
 
 <script lang="ts">
@@ -35,7 +35,7 @@ import FlagsDialog from './FlagsDialog.vue';
 export default class Groups extends Vue {
   private groups: Group[] = [];
 
-  private editFlagsGroup: string | null = null;
+  private editFlagsGroup: number | null = null;
 
   mounted() {
     this.fetchGroups();
@@ -77,7 +77,7 @@ export default class Groups extends Vue {
     await this.fetchGroups();
   }
 
-  async deleteGroup(groupId: string) {
+  async deleteGroup(groupId: number) {
     if (!await confirm(`Delete group`, `Do you really want to relete the group?`)) return;
 
     await GroupsApi.deleteGroup(groupId, this.instance);
@@ -85,7 +85,7 @@ export default class Groups extends Vue {
     await this.fetchGroups();
   }
 
-  async editFlags(groupId: string) {
+  async editFlags(groupId: number) {
     this.editFlagsGroup = groupId;
   }
 }

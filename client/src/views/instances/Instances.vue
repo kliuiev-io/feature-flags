@@ -35,9 +35,7 @@ export default class Instances extends Vue {
   }
 
   async fetchInstances() {
-    const instances = await InstancesApi.getInstances();
-
-    this.instances = instances.map((instance) => ({ name: instance }));
+    this.instances = await InstancesApi.getInstances();
 
     await this.$store.dispatch(`fetchInstances`);
   }

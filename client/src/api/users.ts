@@ -1,6 +1,9 @@
 import { Api } from "./api";
+import { Group } from "./groups";
+import { Flag } from "./instances";
 
 export interface User {
+  id: number;
   email: string;
   groups: string[];
   flags: string[];
@@ -13,11 +16,11 @@ export class UsersApi {
 
   static deleteUser = (email: string, instance: string) => Api.delete(`users/${instance}/${email}`);
 
-  static getGroupsIds = (email: string, instance: string) => Api.get<string[]>(`users/${instance}/${email}/groups`);
+  static getGroups = (email: string, instance: string) => Api.get<Group[]>(`users/${instance}/${email}/groups`);
 
-  static setGroupsIds = (email: string, instance: string, groups: string[]) => Api.put(`users/${instance}/${email}/groups`, { groups });
+  static setGroupsIds = (email: string, instance: string, groupsIds: number[]) => Api.put(`users/${instance}/${email}/groups`, { groups: groupsIds });
 
-  static getFlagsIds = (email: string, instance: string) => Api.get<string[]>(`users/${instance}/${email}/flags`);
+  static getFlagsNames = (email: string, instance: string) => Api.get<string[]>(`users/${instance}/${email}/flags`);
 
-  static setFlagsIds = (email: string, instance: string, flags: string[]) => Api.put(`users/${instance}/${email}/flags`, { flags });
+  static setFlagsNames = (email: string, instance: string, flagsNames: string[]) => Api.put(`users/${instance}/${email}/flags`, { flags: flagsNames });
 }
