@@ -15,6 +15,9 @@ export class Flag {
   @Column()
   defaultState: boolean;
 
-  @ManyToOne(() => Instance, (instance) => instance.name)
+  @ManyToOne(() => Instance, (instance) => instance.name, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   instance: Instance;
 }

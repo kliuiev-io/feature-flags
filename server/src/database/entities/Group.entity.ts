@@ -6,6 +6,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Flag } from './Flag.entity';
 import { Instance } from './Instance.entity';
 import { User } from './User.entity';
 
@@ -20,10 +21,17 @@ export class Group {
   @Column()
   description: string;
 
-  @ManyToOne(() => Instance, (instance) => instance.name)
+  @ManyToOne(() => Instance, (instance) => instance.name, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   instance: Instance;
 
-  @ManyToMany(() => User)
+  @ManyToMany(() => User, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   @JoinTable()
   users: User[];
+
+  @ManyToMany(() => Flag, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+  @JoinTable()
+  flags: Flag[];
 }

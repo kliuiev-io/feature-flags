@@ -7,13 +7,11 @@ import {
   validateInstanceName,
 } from 'src/utils';
 import { Repository } from 'typeorm';
-import { FlagBase, Flags, GroupBase, Instances } from './database.interface';
+import { FlagBase, Flags, GroupBase } from './database.interface';
 import { Flag } from './entities/Flag.entity';
 import { Group } from './entities/Group.entity';
 import { Instance } from './entities/Instance.entity';
 import { User } from './entities/User.entity';
-
-const mockDatabase: Instances = {};
 
 @Injectable()
 export class DatabaseService {
@@ -30,11 +28,15 @@ export class DatabaseService {
   async instanceFlagCheckExists(flagName: string, instance: string) {
     await this.throwIfInstanceDoesNotExist(instance);
 
-    return Boolean(mockDatabase[instance].flags[flagName]);
+    return Boolean(
+      await this.flagsRepository.findOne({
+        where: { instance: { name: instance }, name: flagName },
+      }),
+    );
   }
 
   async instanceCheckExists(name: string) {
-    return typeof mockDatabase[name] !== 'undefined';
+    return Boolean(this.instancesRepository.findOne(name));
   }
 
   async instanceCreate(name: string) {
@@ -43,21 +45,20 @@ export class DatabaseService {
     if (await this.instanceCheckExists('name'))
       throw new NotFoundException(`Instance ${name} already exists`);
 
-    mockDatabase[name] = {
-      flags: {},
-      groups: [],
-      users: [],
-    };
+    await this.instancesRepository.create({ name });
   }
 
   async instanceGetInstances() {
-    return Object.keys(mockDatabase);
+    return this.instancesRepository.find();
   }
 
   async instanceFlagGet(flagName: string, instance: string) {
     await this.throwIfInstanceFlagDoesNotExist(flagName, instance);
 
-    return mockDatabase[instance].flags[flagName];
+    return this.flagsRepository.findOne({
+      instance: { name: instance },
+      name: flagName,
+    });
   }
 
   async instanceFlagCreate(
@@ -72,11 +73,12 @@ export class DatabaseService {
         `The flag ${flagName} is already exists in the instance ${instance}`,
       );
 
-    mockDatabase[instance].flags[flagName] = {
-      id: flagName,
+    await this.flagsRepository.create({
+      name: flagName,
       description,
+      instance: { name: instance },
       defaultState,
-    };
+    });
   }
 
   async instanceFlagUpdate(
@@ -86,14 +88,16 @@ export class DatabaseService {
   ) {
     await this.throwIfInstanceFlagDoesNotExist(flagName, instance);
 
-    const flag = mockDatabase[instance].flags[flagName];
+    const flag = await this.instanceFlagGet(flagName, instance);
 
-    mockDatabase[instance].flags[flagName] = {
-      ...flag,
-      description: description || flag.description,
-      defaultState:
-        typeof defaultState === 'boolean' ? defaultState : flag.defaultState,
-    };
+    await this.flagsRepository.update(
+      { instance: { name: instance }, name: flagName },
+      {
+        description: description || flag.description,
+        defaultState:
+          typeof defaultState === 'boolean' ? defaultState : flag.defaultState,
+      },
+    );
   }
 
   async instanceFlagDelete(flagName: string, instance: string) {
@@ -101,32 +105,28 @@ export class DatabaseService {
 
     // TODO: Remove flag from all groups and users
 
-    delete mockDatabase[instance].flags[flagName];
+    await this.flagsRepository.delete({
+      instance: { name: instance },
+      name: flagName,
+    });
   }
 
-  async instanceGetFlags(name: string) {
-    await this.throwIfInstanceDoesNotExist(name);
+  async instanceGetFlags(instance: string) {
+    await this.throwIfInstanceDoesNotExist(instance);
 
-    return mockDatabase[name].flags;
+    return this.flagsRepository.find({ instance: { name: instance } });
   }
 
-  private async instanceSetFlags(name: string, flags: Flags) {
-    await this.throwIfInstanceDoesNotExist(name);
-    mockDatabase[name].flags = flags;
-  }
+  async instanceDelete(instance: string) {
+    await this.throwIfInstanceDoesNotExist(instance);
 
-  async instanceDelete(name: string) {
-    await this.throwIfInstanceDoesNotExist(name);
-    delete mockDatabase[name];
+    await this.instancesRepository.delete({ name: instance });
   }
 
   async instanceRename(oldName: string, newName: string) {
     validateInstanceName(newName);
 
-    const flags = await this.instanceGetFlags(oldName);
-    await this.instanceCreate(newName);
-    await this.instanceSetFlags(newName, flags);
-    await this.instanceDelete(oldName);
+    await this.instancesRepository.update({ name: oldName }, { name: newName });
   }
 
   async userCheckExists(email: string, instance: string) {
@@ -136,22 +136,19 @@ export class DatabaseService {
   async userGetUsers(instance: string) {
     await this.throwIfInstanceDoesNotExist(instance);
 
-    return mockDatabase[instance].users;
+    return await this.usersRepository.find({ instance: { name: instance } });
   }
-  // async userGetUsers(instance: string) {
-  //   // await this.throwIfInstanceDoesNotExist(instance);
-  //   return await this.usersRepository.find();
-
-  //   return mockDatabase[instance].users;
-  // }
 
   async userGetByEmail(email: string, instance: string) {
     await this.throwIfInstanceDoesNotExist(instance);
 
-    return mockDatabase[instance].users.find((user) => user.email === email);
+    return this.usersRepository.findOne({
+      instance: { name: instance },
+      email,
+    });
   }
 
-  async userRegister(email: string, instance: string, groups: string[] = []) {
+  async userRegister(email: string, instance: string) {
     validateEmail(email);
 
     await this.throwIfInstanceDoesNotExist(instance);
@@ -161,19 +158,16 @@ export class DatabaseService {
         `User ${email} already exists in instance ${instance}`,
       );
 
-    mockDatabase[instance].users.push({
-      email: email,
-      groups,
-      flags: [],
+    await this.usersRepository.create({
+      instance: { name: instance },
+      email,
     });
   }
 
   async userDelete(email: string, instance: string) {
     await this.throwIfUserDoesNotExist(email, instance);
 
-    mockDatabase[instance].users = mockDatabase[instance].users.filter(
-      (user) => user.email !== email,
-    );
+    this.usersRepository.delete({ instance: { name: instance }, email });
   }
 
   async userGetFlags(email: string, instance: string) {
@@ -187,9 +181,12 @@ export class DatabaseService {
   async userSetFlags(email: string, instance: string, flags: string[]) {
     this.throwIfUserDoesNotExist(email, instance);
 
-    const user = await this.userGetByEmail(email, instance);
-
-    user.flags = flags;
+    await this.usersRepository.update(
+      { instance: { name: instance }, email },
+      {
+        flags: flags.map((name) => ({ name })),
+      },
+    );
   }
 
   async userGetGroups(email: string, instance: string) {
@@ -203,40 +200,42 @@ export class DatabaseService {
   async userSetGroups(email: string, instance: string, groups: string[]) {
     this.throwIfUserDoesNotExist(email, instance);
 
-    const user = await this.userGetByEmail(email, instance);
-
-    user.groups = groups;
+    await this.usersRepository.update(
+      { instance: { name: instance }, email },
+      {
+        groups: groups.map((name) => ({ name })),
+      },
+    );
   }
 
-  async groupCheckExists(groupId: string, instance: string) {
+  async groupCheckExists(groupId: number, instance: string) {
     return Boolean(await this.groupGetById(groupId, instance));
   }
 
-  async groupGetById(groupId: string, instance: string) {
+  async groupGetById(groupId: number, instance: string) {
     await this.throwIfInstanceDoesNotExist(instance);
 
-    return mockDatabase[instance].groups.find((group) => group.id === groupId);
+    return this.groupsRepository.findOne(groupId);
   }
 
   async groupGetGroups(instance: string) {
     await this.throwIfInstanceDoesNotExist(instance);
 
-    return mockDatabase[instance].groups;
+    return this.groupsRepository.find({ instance: { name: instance } });
   }
 
   async groupAdd({ name, description }: GroupBase, instance: string) {
     await this.throwIfInstanceDoesNotExist(instance);
 
-    mockDatabase[instance].groups.push({
-      id: generateId(),
+    await this.groupsRepository.create({
       name,
       description,
-      flags: [],
+      instance: { name: instance },
     });
   }
 
   async groupUpdate(
-    groupId: string,
+    groupId: number,
     { name, description }: GroupBase,
     instance: string,
   ) {
@@ -244,26 +243,37 @@ export class DatabaseService {
 
     if (name) group.name = name;
     if (description) group.description = description;
-  }
 
-  async groupDelete(groupId: string, instance: string) {
-    await this.throwIfGroupDoesNotExist(groupId, instance);
-
-    mockDatabase[instance].groups = mockDatabase[instance].groups.filter(
-      (group) => group.id !== groupId,
+    await this.groupsRepository.update(
+      { id: groupId },
+      {
+        name: name || group.name,
+        description: description || group.description,
+      },
     );
   }
 
-  async groupGetFlags(groupId: string, instance: string) {
+  async groupDelete(groupId: number, instance: string) {
+    await this.throwIfGroupDoesNotExist(groupId, instance);
+
+    await this.groupsRepository.delete(groupId);
+  }
+
+  async groupGetFlags(groupId: number, instance: string) {
     const group = await this.groupGetById(groupId, instance);
 
     return group.flags;
   }
 
-  async groupSetFlags(groupId: string, instance: string, flags: string[]) {
-    const group = await this.groupGetById(groupId, instance);
+  async groupSetFlags(groupId: number, instance: string, flags: string[]) {
+    await this.throwIfGroupDoesNotExist(groupId, instance);
 
-    group.flags = flags;
+    await this.groupsRepository.update(
+      { id: groupId },
+      {
+        flags: flags.map((name) => ({ name })),
+      },
+    );
   }
 
   private async throwIfInstanceDoesNotExist(name: string) {
@@ -288,7 +298,7 @@ export class DatabaseService {
       );
   }
 
-  private async throwIfGroupDoesNotExist(groupId: string, instance: string) {
+  private async throwIfGroupDoesNotExist(groupId: number, instance: string) {
     if (!(await this.groupCheckExists(groupId, instance)))
       throw new NotFoundException(
         `Group ${groupId} doesn't exist in instance ${instance}`,
