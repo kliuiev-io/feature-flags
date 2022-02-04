@@ -12,7 +12,7 @@ npm i fflags
 yarn add fflags
 ```
 
-### To use in node.js
+### To use with node.js
 
 ```
 npm i fflags node-fetch@2

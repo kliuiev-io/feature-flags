@@ -1,6 +1,6 @@
 {
   "name": "fflags",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Feature flags npm package (browser and nodejs) with TypeScript support",
   "main": "dist/index.js",
   "scripts": {
