@@ -1,5 +1,10 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ClientService } from './client.service';
 
 @Controller('client')
@@ -7,16 +12,14 @@ import { ClientService } from './client.service';
 export class ClientController {
   constructor(private readonly clientService: ClientService) {}
 
-  @Get(':instance')
-  async getFlags(@Param('instance') instance: string) {
-    return this.clientService.getFlags(null, instance);
-  }
-
-  @Get(':instance/:email')
+  @Get(':instance/:email?')
+  @ApiOperation({ description: 'Get flags of the user' })
+  @ApiOkResponse()
+  @ApiBadRequestResponse()
   async getFlagsUser(
     @Param('instance') instance: string,
-    @Param('email') email: string,
+    @Param('email') email: string | null,
   ) {
-    return this.clientService.getFlags(email, instance);
+    return this.clientService.getFlags(email || null, instance);
   }
 }
