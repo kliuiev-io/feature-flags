@@ -1,0 +1,8 @@
+Server:
+- server/**/*
+
+Client:
+- client/**/*
+
+Package:
+- package/**/*
